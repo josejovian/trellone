@@ -49,13 +49,15 @@ const Navigation = (props) => {
 				>
 					<Input 
 						width="24rem"
-						placeholder="Keyword..."	
+						placeholder="Keyword..."
+						zIndex="1"
 					/>
 					<IconButton
 						size="sm"
 						position="absolute"
 						right="4px"
 						colorScheme="blue"
+						zIndex="2"
 						icon={<BsSearch />}
 					/>
 				</Flex>

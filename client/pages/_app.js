@@ -1,4 +1,4 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
 import "../styles/globals.css";
 import Navigation from "../components/Navigation.js";
 import { useRouter } from "next/router";
@@ -11,7 +11,9 @@ function MyApp({ Component, pageProps }) {
 	return (
 		<ChakraProvider theme={theme}>
 			<Navigation />
-			<Component {...pageProps} key={path} />
+			<Box paddingTop="4rem">
+				<Component {...pageProps} key={path} />
+			</Box>
 		</ChakraProvider>
 	);
 }
