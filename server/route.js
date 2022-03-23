@@ -1,6 +1,5 @@
 const express = require("express");
 const routes = express.Router();
-const dbo = require("./conn");
 const axios = require("axios");
 
 const ObjectId = require("mongodb").ObjectId;
