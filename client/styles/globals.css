@@ -3,17 +3,42 @@ body {
 	padding: 0;
 	margin: 0;
 }
-
 @font-face {
-    font-family: 'Montserrat';
-    src: url('../public/fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
+	font-family: "Montserrat";
+	src: url("../public/fonts/Montserrat-VariableFont_wght.ttf")
+		format("truetype");
+	font-weight: 400;
+	font-style: normal;
 }
 
 @font-face {
-    font-family: 'NotoSansDisplay';
-    src: url('../public/fonts/NotoSansDisplay-VariableFont_wdth,wght.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
+	font-family: "NotoSansDisplay";
+	src: url("../public/fonts/NotoSansDisplay-VariableFont_wdth,wght.ttf")
+		format("truetype");
+	font-weight: 400;
+	font-style: normal;
+}
+
+/* width */
+::-webkit-scrollbar {
+	border-radius: 32px;
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+	border-radius: 32px;
+	background: rgba(0,0,0,0.2);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	border-radius: 32px;
+	background: var(--chakra-colors-gray-400);
+	background: rgba(0,0,0,0.2);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: var(--chakra-colors-gray-600);
 }
