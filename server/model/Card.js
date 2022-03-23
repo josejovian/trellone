@@ -14,7 +14,7 @@ const cardSchema = new mongoose.Schema({
 	pictureAuthorURL: String,
 	description: String,
 	tags: [ String ],
-	attachments: [ String ],
+	attachments: [ Object ],
 	members: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User'

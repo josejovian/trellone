@@ -11,6 +11,7 @@ const boardSchema = new mongoose.Schema({
 	pictureAuthorURL: String,
 	description: String,
 	isPublic: Boolean,
+	cards: Number,
 	lists: [{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'List'
