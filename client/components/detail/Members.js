@@ -199,7 +199,6 @@ export const AddMembers = ({
 		<Popover
 			placement="bottom-start"
 			width="min-content"
-			{...eraseFocusBorder}
 			isLazy
 		>
 			<PopoverTrigger><Box>{buttonElement}</Box></PopoverTrigger>
