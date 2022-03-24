@@ -45,7 +45,7 @@ const Navigation = ({ loggedIn, loginUser, logoutUser, currentBoard }) => {
 	}, []);
 
 	function login() {
-		window.open("http://localhost:5000/login/start", "_self");
+		window.open(`https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_CLIENT_ID}`, "_self");
 	}
 
 	function logout() {
