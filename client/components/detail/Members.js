@@ -21,7 +21,6 @@ import {
 } from "react-icons/bs";
 import {
 	buttonStyle,
-	eraseFocusBorder,
 	modifiedGhostStyle,
 } from "../styling/ComponentStyling";
 
