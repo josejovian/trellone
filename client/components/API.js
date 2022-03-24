@@ -1,7 +1,7 @@
 import axios from "axios";
 import { showToast, showStandardToast } from "./utility/Toast";
 
-const baseURL = process.env.NEXT_API_EP;
+const baseURL = process.env.NEXT_PUBLIC_API_EP;
 
 export const api = axios.create({
 	baseURL

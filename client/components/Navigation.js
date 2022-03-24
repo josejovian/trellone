@@ -20,14 +20,16 @@ const Navigation = ({ loggedIn, loginUser, logoutUser, currentBoard }) => {
 	const path = router.asPath;
 	const query = useRouter().query;
 
+	console.log(process.env.NEXT_PUBLIC_API_KEY);
+
 	async function authenticate() {
 		let { code } = query;
-		
+
 		// User is already logged in, so do nothing.
 		if (loggedIn !== null) return;
 
 		// User is in the process of logging in.
-		if (code !== undefined || code !== null || code !== "") {
+		if (code) {
 			await api
 				.post("/login/end", { code: code })
 				.then((res) => {
@@ -45,7 +47,7 @@ const Navigation = ({ loggedIn, loginUser, logoutUser, currentBoard }) => {
 	}, []);
 
 	function login() {
-		window.open(`https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_CLIENT_ID}`, "_self");
+		window.open(`https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}`, "_self");
 	}
 
 	function logout() {
