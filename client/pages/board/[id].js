@@ -36,7 +36,7 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 	/* ---------- Socket-related stuff to emulate real-time interaction --------- */
 
 	const [socket, setSocket] = useState(
-		io(process.env.NEXT_API_EP, { transports: ["websocket", "polling"] })
+		io(process.env.NEXT_PUBLIC_API_EP, { transports: ["websocket", "polling"] })
 	);
 
 	// Update new board for users who subbed to this board.
