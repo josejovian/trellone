@@ -20,8 +20,6 @@ const Navigation = ({ loggedIn, loginUser, logoutUser, currentBoard }) => {
 	const path = router.asPath;
 	const query = useRouter().query;
 
-	console.log(process.env.NEXT_PUBLIC_API_KEY);
-
 	async function authenticate() {
 		let { code } = query;
 
