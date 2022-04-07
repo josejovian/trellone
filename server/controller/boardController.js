@@ -9,7 +9,7 @@ const io = require("../server");
 const { exception } = require("./error");
 const { hasAccessToBoard } = require("./access");
 const ObjectId = require("mongodb").ObjectId;
-
+const { createList } = require("./cardController");
 const funcGetBoard = async (req, res) => {
 
 	return await Board.findOne({ _id: req.params.id })
@@ -111,6 +111,16 @@ const createBoard = async (req, res) => {
 			members: [],
 			tags: [],
 		});
+
+		const list = new List({
+			name: "Untitled List",
+			boardID: board._id,
+			cards: [],
+		});
+
+		await list.save();
+
+		board.lists.push(list._id);
 		await board.save();
 
 		res.send(board);
