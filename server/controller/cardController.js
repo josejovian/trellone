@@ -79,9 +79,20 @@ const updateList = async (req, res) => {
 };
 
 const deleteList = async (req, res) => {
+	const { userID } = req.body;
+
 	try {
 		let list = await List.findOne({ _id: req.params.id });
 		let board = await Board.findOne({ _id: list.boardID });
+
+		if(denyAccess(userID, board, 1, res))
+			return;
+
+		if(board.lists.length === 1) {
+			res.statusMessage = "You cannot have less than 1 list in one board.";
+			res.status(204).send("");
+			return;
+		}
 
 		let cards = await Card.find({ listID: list._id });
 		cards.forEach(async (card) => {
