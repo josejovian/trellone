@@ -117,10 +117,7 @@ io.on("connection", async (socket) => {
 http.listen(port, async () => {
 
 	async function emitBoardUpdate(data) {
-		if(!data.operationType === "insert" && !data.operationType === "update")
-			return;
-
-		const _id = data.documentKey._id;
+		const _id = data.documentKey["_id"];
 		const _board = await Board.findOne({ _id });
 		const { name, description, isPublic, members } = _board;
 
@@ -133,10 +130,7 @@ http.listen(port, async () => {
 	}
 
 	async function emitCardUpdate(data) {
-		if(!data.operationType === "insert" && !data.operationType === "update")
-			return;
-
-		const _id = data.documentKey._id;
+		const _id = data.documentKey["_id"];
 		const _card = await Card.findOne({ _id }).populate([
 			{
 				path: "comments",
@@ -160,10 +154,7 @@ http.listen(port, async () => {
 	}
 
 	async function emitListUpdate(data) {
-		if(!data.operationType === "insert" && !data.operationType === "update")
-			return;
-		
-		const _id = data.documentKey._id;
+		const _id = data.documentKey["_id"];
 		const _list = await List.findOne({ _id });
 
 		if(!_list)
