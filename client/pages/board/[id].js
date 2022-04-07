@@ -263,11 +263,10 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 	function applyNewList(_list) {
 		
 		const boardLists = board.lists;
-		boardLists.push(_list);
 
 		_setBoard({
 			...board,
-			lists: boardLists
+			lists: boardLists.concat([ _list ]),
 		});
 	}
 
