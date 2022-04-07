@@ -160,7 +160,7 @@ export const ListColumn = ({ list, onOpen, purpose, boardID, loggedIn }) => {
 	}
 
 	async function deleteList() {
-		await api.delete(`/list/${list._id}`).catch((e) => {
+		await api.delete(`/list/${list._id}`, { userID: loggedIn._id }).catch((e) => {
 			showStandardToast(toast, toastIdRef, "genericFail");
 		}).then((response) => {
 			if(response.status !== 200)
