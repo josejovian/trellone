@@ -70,7 +70,7 @@ export const ChangeName = ({
 	useEffect(() => {
 		const input = document.getElementById(inputID);
 		input.value = title;
-	}, []);
+	}, [title]);
 
 	function onSubmit() {
 		if(editList === id)
