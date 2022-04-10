@@ -81,6 +81,7 @@ const updateList = async (req, res) => {
 const deleteList = async (req, res) => {
 	try {
 		let list = await List.findOne({ _id: req.params.id });
+
 		let board = await Board.findOne({ _id: list.boardID });
 
 		let cards = await Card.find({ listID: list._id });
@@ -100,10 +101,11 @@ const deleteList = async (req, res) => {
 		await board.save();
 		await List.deleteOne({ _id: list._id });
 		
-		res.send({
-			board: board._id, 
-			list: list._id
-		});
+		let result = {
+			boardID: board._id, 
+			listID: list._id,
+		};
+		res.send(result);
 	} catch (e) {
 		exception(res);
 	}

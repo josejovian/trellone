@@ -166,9 +166,8 @@ export const ListColumn = ({ list, onOpen, purpose, boardID, loggedIn }) => {
 			if(response.status !== 200)
 				showToast(toast, toastIdRef, "Oops!", response.statusText, "error", 2000, true);
 			else {
-				socket.emit("list_new", response.data);
+				socket.emit("list_delete", response.data);
 			}
-			socket.emit("list_delete", response.data);
 		});
 	}
 
