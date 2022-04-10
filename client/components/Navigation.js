@@ -81,7 +81,7 @@ const Navigation = ({ loggedIn, loginUser, logoutUser, currentBoard }) => {
 					size="md"
 					display={!path.includes("/board/") || currentBoard === null ? "none" : "initial"}
 				>
-					{currentBoard !== null ? currentBoard : ""}
+					{currentBoard ?? ""}
 				</Heading>
 			</Flex>
 			<Flex>

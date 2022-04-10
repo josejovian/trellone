@@ -28,8 +28,8 @@ import { useRef, useState, useEffect } from "react";
 import api from "../../components/API";
 import io from "socket.io-client";
 
-export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, setBoard}) {
-	const [board, _setBoard] = useState(_board);
+export function Board({ initialBoard, id, loggedIn, allMembers, currentCard, setCard, setBoard}) {
+	const [board, _setBoard] = useState(initialBoard);
 	const toast = useToast();
 	const toastIdRef = useRef();
 
@@ -40,13 +40,15 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 	);
 
 	// Update new board for users who subbed to this board.
-	function applyBoard(_board) {
-		
-		
-		_setBoard({
-			...board,
+	function applyBoard(_board, type=null) {
+		if(_board.lists) {
+			return;
+		}
+
+		_setBoard((oldBoard) => ({
+			...oldBoard,
 			..._board,
-		});
+		}));
 	}
 
 	/*
@@ -110,33 +112,41 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 
 	// Update new list for users who subbed to this board.
 	function applyList(_list) {
-		const boardLists = board.lists;
+		_setBoard((oldBoard) => {
+			const boardLists = oldBoard.lists;
 
-		boardLists.forEach((list, index) => {
-			if (String(list._id) === String(_list._id)) {
-				boardLists[index] = _list;
+			boardLists.every((list, index) => {
+				if (String(list._id) === String(_list._id)) {
+					boardLists[index] = _list;
+					return false;
+				}
+				return true;
+			});
+
+			return {
+				...oldBoard,
+				lists: boardLists,
 			}
-		});
-
-		_setBoard({
-			...board,
-			lists: boardLists,
 		});
 	}
 
 	// Update list (only the name) for users who subbed.
 	function applyListShallow(_list) {
-		const boardLists = board.lists;	
+		_setBoard((oldBoard) => {
+			const boardLists = oldBoard.lists;
 
-		boardLists.forEach((list, index) => {
-			if (String(list._id) === String(_list._id)) {
-				boardLists[index].name = _list.name;
+			boardLists.every((list, index) => {
+				if (String(list._id) === String(_list._id)) {
+					boardLists[index].name = _list.name;
+					return false;
+				}
+				return true;
+			});
+
+			return {
+				...oldBoard,
+				lists: boardLists,
 			}
-		});
-
-		_setBoard({
-			...board,
-			lists: boardLists,
 		});
 	}
 
@@ -177,11 +187,14 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 	function applyNewCard(_card) {
 		const boardLists = board.lists;
 
-		boardLists.forEach((list, index) => {
+		boardLists.every((list, index) => {
 			if (String(list._id) === String(_card.listID)) {
-				boardLists[index].cards.push(_card);
+				boardLists[index].cards = [...boardLists[index].cards, _card];
+				return false;
 			}
+			return true;
 		});
+
 		_setBoard({
 			...board,
 			lists: boardLists,
@@ -228,15 +241,17 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 	// Remove list, if users subbed to the list's board.
 	function applyRemovedList(id) {
 		let boardLists = board.lists;
-		
+
 		boardLists = boardLists.filter((list) => {
 			return String(list._id) !== String(id);
 		});
 
-		_setBoard({
-			...board,
-			lists: boardLists,
-		});
+		_setBoard((oldBoard) => ({
+			...oldBoard,
+			lists: oldBoard.lists.filter((list) => {
+				return String(list._id) !== String(id);
+			})
+		}));
 	}
 
 	// Remove card, if users subbed to the list's board.
@@ -245,7 +260,7 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 
 		boardLists.every((list, idx) => {
 			if (String(list._id) === String(_card.listID)) {
-				list.cards = list.cards.filter((card) => {
+				boardLists[idx].cards = list.cards.filter((card) => {
 					return String(card._id) !== String(_card._id)
 				});
 				return false;
@@ -260,14 +275,15 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 	}
 
 	// Add list, if users subbed to the list's board.
-	function applyNewList(_list) {
+	async function applyNewList(_list) {
 		
-		const boardLists = board.lists;
+		let boardLists = board.lists;
+		boardLists = [...boardLists, _list];
 
-		_setBoard({
-			...board,
-			lists: boardLists.concat([ _list ]),
-		});
+		_setBoard((oldBoard) => ({
+			...oldBoard,
+			lists: [...oldBoard.lists, _list]
+		}));
 	}
 
 	function applyNewMember(params) {
@@ -295,16 +311,16 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 	}
 
 	useEffect(() => {
-		if(_board) {
+		if(initialBoard) {
 			socket.emit("board_subscribe", {
-				id: _board._id,
+				id: initialBoard._id,
 			});
 		} else {
 			setBoard(null);
 		}
 		return () => {
-			_setBoard(_board); // This worked for me
-		};
+			socket.disconnect();
+		}
 	}, []);
 
 	useEffect(() => {
@@ -329,7 +345,7 @@ export function Board({ _board, id, loggedIn, allMembers, currentCard, setCard, 
 		socket.on("comment_delete", applyCardFromID);
 		socket.on("attachment_delete", applyCardFromID);
 
-	}, [socket]);
+	}, []);
 
 	// Function to add member to card/board.
 	async function addMember(type, _id, member) {
@@ -428,7 +444,7 @@ export async function getServerSideProps(req) {
 		else return null;
 	});
 
-	const _board = await api
+	const initialBoard = await api
 		.get(`/board/${req.query.id}`)
 		.then((res) => {
 			if (res.status === 200) {
@@ -441,7 +457,7 @@ export async function getServerSideProps(req) {
 		});
 
 	// Pass data to the page via props
-	return { props: { _board, id: req.query.id, allMembers } };
+	return { props: { initialBoard, id: req.query.id, allMembers } };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Board);
