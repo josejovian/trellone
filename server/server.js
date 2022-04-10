@@ -77,12 +77,15 @@ io.on("connection", async (socket) => {
 
 	socket.on("list_new", async (id) => {
 		const _list = await List.findOne({ _id: id });
-
 		io.in(String(_list.boardID)).emit("list_new", _list);
 	});
 
-	socket.on("list_delete", async ({ board, list }) => {
-		io.in(String(board)).emit("list_delete", list);
+	socket.on("list_update", async (data) => {
+		io.in(String(data.boardID)).emit("list_update", data);
+	});
+
+	socket.on("list_delete", async (data) => {
+		io.in(String(data.boardID)).emit("list_delete", data.listID);
 	});
 
 	socket.on("comment_new", async (data) => {
@@ -117,6 +120,10 @@ io.on("connection", async (socket) => {
 http.listen(port, async () => {
 
 	async function emitBoardUpdate(data) {
+	
+		if(data.operationType !== "update")
+			return;
+	
 		const _id = data.documentKey["_id"];
 		const _board = await Board.findOne({ _id });
 		const { name, description, isPublic, members } = _board;
@@ -130,6 +137,9 @@ http.listen(port, async () => {
 	}
 
 	async function emitCardUpdate(data) {
+		if(data.operationType !== "update")
+			return;
+
 		const _id = data.documentKey["_id"];
 		const _card = await Card.findOne({ _id }).populate([
 			{
@@ -154,6 +164,9 @@ http.listen(port, async () => {
 	}
 
 	async function emitListUpdate(data) {
+		if(data.operationType !== "update")
+			return;
+
 		const _id = data.documentKey["_id"];
 		const _list = await List.findOne({ _id });
 
