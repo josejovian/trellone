@@ -59,55 +59,59 @@ export function Board({ initialBoard, id, loggedIn, allMembers, currentCard, set
 	// Update involved lists and card when user drags a card from a list to another.
 	function applySwitch({ from, to }) {
 		
-		const boardLists = board.lists;
-		let listFrom, listTo;
+		_setBoard((oldBoard) => {
+			const boardLists = oldBoard.lists;
+			let listFrom, listTo;
 
-		function sameList() {
-			return String(from.listID) === String(to.listID);
-		}
-
-		let remaining = 0;
-		boardLists.every((list) => {
-			if (String(list._id) === String(from.listID)) {
-				listFrom = list;
-				remaining--;
+			function sameList() {
+				return String(from.listID) === String(to.listID);
 			}
-			if (String(list._id) === String(to.listID)) {
-				listTo = list;
-				remaining--;
-			}
-			return (remaining !== 0);
-		});
 
-		let returnCard;
-		function removeFromList(dbList) {
-			dbList.cards = dbList.cards.filter((card, index) => {
-				if(String(card._id) === String(from.cardID)) {
-					returnCard = card;
+			let remaining = 0;
+			boardLists.every((list) => {
+				if (String(list._id) === String(from.listID)) {
+					listFrom = list;
+					remaining--;
 				}
-				return String(card._id) !== String(from.cardID);
+				if (String(list._id) === String(to.listID)) {
+					listTo = list;
+					remaining--;
+				}
+				return (remaining !== 0);
 			});
-		}
 
-		function addToList(dbList) {
-			dbList.cards.splice(to.cardIndex + 0.5, 0, returnCard);
-		}
+			let returnCard;
+			function removeFromList(dbList) {
+				dbList.cards = dbList.cards.filter((card, index) => {
+					if(String(card._id) === String(from.cardID)) {
+						returnCard = card;
+					}
+					return String(card._id) !== String(from.cardID);
+				});
+			}
 
-		if (sameList()) {
-			if (from.cardIndex < to.cardIndex) {
-				to.cardIndex -= 1;
-			};
-			removeFromList(listFrom);
-			addToList(listFrom);
-		} else {
-			removeFromList(listFrom);
-			addToList(listTo);
-			applyList(listTo);
-		}
+			function addToList(dbList) {
+				dbList.cards.splice(to.cardIndex + 0.5, 0, returnCard);
+			}
 
-		applyList(listFrom);
-		returnCard.listID = listTo._id;
-		applyCard(returnCard);
+			if (sameList()) {
+				if (from.cardIndex < to.cardIndex) {
+					to.cardIndex -= 1;
+				};
+				removeFromList(listFrom);
+				addToList(listFrom);
+			} else {
+				removeFromList(listFrom);
+				addToList(listTo);
+				applyList(listTo);
+			}
+
+			applyList(listFrom);
+			returnCard.listID = listTo._id;
+			applyCard(returnCard);
+
+			return oldBoard;
+		});	
 	}
 
 	// Update new list for users who subbed to this board.
@@ -152,90 +156,97 @@ export function Board({ initialBoard, id, loggedIn, allMembers, currentCard, set
 
 	// Update new card for users who subbed to this board.
 	function applyCard(_card, _indexes=null) {
-		const boardLists = board.lists;
+		_setBoard((oldBoard) => {
+			const boardLists = oldBoard.lists;
 
-		if(!_card)
-			return;
-
-		if(_indexes !== null) {
-			boardLists[_indexes.list].cards[_indexes.card] = _card;
-			setCard(_card, boardLists[_indexes.list].name);
-		} else {
-			boardLists.every((list, idx) => {
-				
-				if (String(list._id) === String(_card.listID)) {
-					list.cards.every((card, index) => {
-						if (String(card._id) === String(_card._id)) {
-							list.cards[index] = _card;
-							setCard(_card, list.name);
-							return false;
-						}
-						return true;
-					});
-					return false;
-				}
-				return true;
-			});
-		}
-		_setBoard({
-			...board,
-			lists: boardLists,
+			if(!_card)
+				return;
+	
+			if(_indexes !== null) {
+				boardLists[_indexes.list].cards[_indexes.card] = _card;
+				setCard(_card, boardLists[_indexes.list].name);
+			} else {
+				boardLists.every((list, idx) => {
+					
+					if (String(list._id) === String(_card.listID)) {
+						list.cards.every((card, index) => {
+							if (String(card._id) === String(_card._id)) {
+								list.cards[index] = _card;
+								setCard(_card, list.name);
+								return false;
+							}
+							return true;
+						});
+						return false;
+					}
+					return true;
+				});
+			}
+			return {
+				...board,
+				lists: boardLists,
+			};
 		});
 	} 
 
 	// Add a new card for users who subbed to this board.
 	function applyNewCard(_card) {
-		const boardLists = board.lists;
+		_setBoard((oldBoard) => {
+			const boardLists = oldBoard.lists;
 
-		boardLists.every((list, index) => {
-			if (String(list._id) === String(_card.listID)) {
-				boardLists[index].cards = [...boardLists[index].cards, _card];
-				return false;
-			}
-			return true;
-		});
-
-		_setBoard({
-			...board,
-			lists: boardLists,
+			boardLists.every((list, index) => {
+				if (String(list._id) === String(_card.listID)) {
+					boardLists[index].cards = [...boardLists[index].cards, _card];
+					return false;
+				}
+				return true;
+			});
+			return {
+				...board,
+				lists: boardLists,
+			};
 		});
 	}
 
 	// Find a card based on the ID, then update it immediately.
 	function applyCardFromID(data) {
-		const boardLists = board.lists;
-		let result;
-
-		function loopCards(listIndex) {
-			boardLists[listIndex].cards.every((card, index) => {
-				if(String(card._id) === String(data.cardID)) {
-					applyCard(card, {
-						list: listIndex,
-						card: index
-					});
-					return false;
-				}
-				return true;
-			});
-		}
-
-		function loopLists(callback) {
-			
-			boardLists.every((list, index) => {
+		_setBoard((oldBoard) => {
+			const boardLists = oldBoard.lists;
+			let result;
+	
+			function loopCards(listIndex) {
+				boardLists[listIndex].cards.every((card, index) => {
+					if(String(card._id) === String(data.cardID)) {
+						applyCard(card, {
+							list: listIndex,
+							card: index
+						});
+						return false;
+					}
+					return true;
+				});
+			}
+	
+			function loopLists(callback) {
 				
-				if (String(list._id) === String(data.listID)) {
-					loopCards(index);
-					return false;
-				}
-				return true;
-			});
-
-			return callback;
-		}
-
-		loopLists(null);
+				boardLists.every((list, index) => {
 					
-		applyCard(result);
+					if (String(list._id) === String(data.listID)) {
+						loopCards(index);
+						return false;
+					}
+					return true;
+				});
+	
+				return callback;
+			}
+	
+			loopLists(null);
+						
+			applyCard(result);
+
+			return oldBoard;
+		});
 	}
 
 	// Remove list, if users subbed to the list's board.
@@ -256,21 +267,23 @@ export function Board({ initialBoard, id, loggedIn, allMembers, currentCard, set
 
 	// Remove card, if users subbed to the list's board.
 	function applyRemovedCard(_card) {
-		const boardLists = board.lists;
+		_setBoard((oldBoard) => {
+			const boardLists = oldBoard.lists;
 
-		boardLists.every((list, idx) => {
-			if (String(list._id) === String(_card.listID)) {
-				boardLists[idx].cards = list.cards.filter((card) => {
-					return String(card._id) !== String(_card._id)
-				});
-				return false;
-			}
-			return true;
-		});
+			boardLists.every((list, idx) => {
+				if (String(list._id) === String(_card.listID)) {
+					boardLists[idx].cards = list.cards.filter((card) => {
+						return String(card._id) !== String(_card._id)
+					});
+					return false;
+				}
+				return true;
+			});
 
-		_setBoard({
-			...board,
-			lists: boardLists,
+			return {
+				...board,
+				lists: boardLists,
+			};
 		});
 	}
 
@@ -280,21 +293,28 @@ export function Board({ initialBoard, id, loggedIn, allMembers, currentCard, set
 		let boardLists = board.lists;
 		boardLists = [...boardLists, _list];
 
-		_setBoard((oldBoard) => ({
-			...oldBoard,
-			lists: [...oldBoard.lists, _list]
-		}));
+		_setBoard((oldBoard) => {
+			return (
+				{
+					...oldBoard,
+					lists: [...oldBoard.lists, _list]
+				}
+			);
+		});
 	}
 
 	function applyNewMember(params) {
-		if(params.type === "board") {
-			applyBoard({
-				...board,
-				members: board.members.concat([ params.data ])
-			});
-		} else {
-			applyCardFromID(params.data.cardID);
-		}
+		_setBoard((oldBoard) => {
+			if(params.type === "board") {
+				applyBoard({
+					...board,
+					members: board.members.concat([ params.data ])
+				});
+			} else {
+				applyCardFromID(params.data.cardID);
+			}
+			return oldBoard;
+		});
 	}
 
 	function applyRemovedMember(params) {
