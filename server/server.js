@@ -68,6 +68,13 @@ io.on("connection", async (socket) => {
 		io.in(String(_list.boardID)).emit("card_new", _card);
 	});
 
+	socket.on("card_update", async (id) => {
+		const _card = await Card.findOne({ _id: id });
+		const _list = await List.findOne({ _id: _card.listID });
+
+		io.in(String(_list.boardID)).emit("card_update", _card);
+	});
+
 	socket.on("card_delete", async (id) => {
 		const _card = await Card.findOne({ _id: id });
 		const _list = await List.findOne({ _id: _card.listID });
@@ -126,13 +133,12 @@ http.listen(port, async () => {
 	
 		const _id = data.documentKey["_id"];
 		const _board = await Board.findOne({ _id });
-		const { name, description, isPublic, members } = _board;
+		const { name, description, isPublic } = _board;
 
 		io.in(String(_id)).emit("board_update", {
 			name,
 			description,
 			isPublic,
-			members,
 		});
 	}
 

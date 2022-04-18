@@ -19,6 +19,16 @@ body {
 	font-style: normal;
 }
 
+/* Page Loading */
+
+.page-loading {
+	transition: all 0.5s;
+}
+
+.page-loading-start {
+	opacity: 1!important;
+}
+
 /* width */
 ::-webkit-scrollbar {
 	border-radius: 32px;
