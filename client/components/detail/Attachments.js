@@ -140,6 +140,7 @@ const Attachments = ({ loggedIn, id, currentCard, attachments }) => {
 	const attachmentsElement = attachments.map((attachment, index) => {
 		return (
 			<HStack
+				key={`attachment-${currentCard._id}-${attachment.createdAt}`}
 				position="relative"
 				borderTop={index === 0 ? "0px" : "1px solid"}
 				borderColor="gray.200"

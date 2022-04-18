@@ -141,6 +141,7 @@ const Comments = ({ loggedIn, cardID, id, comments, handler }) => {
 
 		return (
 			<Box
+				key={`comment-${comment._id}`}
 				position="relative"
 				borderTop={index === 0 ? "0px" : "1px solid"}
 				borderColor="gray.200"
