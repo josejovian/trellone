@@ -31,7 +31,7 @@ import Search from "../Search";
 import CardActionButton from "./CardActionButton";
 
 // Misc
-import { useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { AccessContext } from "../utility/AccessContext";
 
 const QueryResults = ({ members, purpose, handler = () => {} }) => {
@@ -176,8 +176,6 @@ export const AddMembers = ({
 				}),
 				setLoading(false)
 			);
-		} else {
-			alert("BLOCKED");
 		}
 	}
 
