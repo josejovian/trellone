@@ -136,7 +136,7 @@ const Comments = ({ loggedIn, cardID, id, comments, handler }) => {
 			top: "2rem",
 			right: "0",
 			display:
-				loggedIn.githubID === comment.author.githubID ? "flex" : "none",
+				loggedIn && loggedIn.githubID === comment.author.githubID ? "flex" : "none",
 		};
 
 		return (
@@ -146,7 +146,7 @@ const Comments = ({ loggedIn, cardID, id, comments, handler }) => {
 				borderTop={index === 0 ? "0px" : "1px solid"}
 				borderColor="gray.200"
 				paddingBottom="2rem"
-				paddingTop="2rem"
+				paddingTop={index === 0 ? "0px" : "2rem"}
 			>
 				<MemberSnippet
 					person={comment.author}
