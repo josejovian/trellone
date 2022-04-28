@@ -247,22 +247,8 @@ const Members = ({
 	style = {},
 	handler = () => {},
 }) => {
-	
 
-	const membersData = [
-		{
-			name: "Bames Jond",
-			pictureURL: "https://via.placeholder.com/40",
-		},
-		{
-			name: "Bames Jond",
-			pictureURL: "https://via.placeholder.com/40",
-		},
-		{
-			name: "Bames Jond",
-			pictureURL: "https://via.placeholder.com/40",
-		},
-	];
+	const { level } = useContext(AccessContext);
 
 	function determineRemovable(id) {
 		return (purpose === "board" && (String(author._id) !== String(id) && String(id) !== String(loggedIn._id))) || purpose === "card";
@@ -309,7 +295,7 @@ const Members = ({
 					id={id}
 					purpose={purpose}
 					person={person}
-					removable={determineRemovable(person._id)}
+					removable={determineRemovable(person._id) && (level > 0)}
 					handler={handler}
 				/>
 			);
